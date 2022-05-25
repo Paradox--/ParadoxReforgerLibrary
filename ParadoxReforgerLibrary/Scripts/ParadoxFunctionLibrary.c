@@ -21,6 +21,30 @@ class ParadoxFunctionLibrary
 	}
 	
 	//-----------------------//
+	// -- Generic Methods -- // 
+	//-----------------------//
+	// returns if we are able to find a valid world from the world context. 
+	// mostly used to make sure the world point is non null. 
+	static bool GetWorldChecked(IEntity worldContext, out BaseWorld outFoundWorld)
+	{
+		// if we have bad input....
+		if(!worldContext)
+		{
+			// reutrn a null value.
+			outFoundWorld = null;
+			return false;
+		}
+		else // else ... 
+		{
+			// get the world from the context
+			outFoundWorld = worldContext.GetWorld();
+			
+			// return if that world is null or not. 
+			return outFoundWorld != null; 
+		}
+	}	
+	
+	//-----------------------//
 	// -- Rank Methods 	  -- // 
 	//-----------------------//
 	
@@ -205,30 +229,20 @@ class ParadoxFunctionLibrary
 	// if the world context is null or the starting time is less than or equal to zero this will fail. 
 	static float GetTimeElapsed(IEntity worldContext, float startingTime)
 	{
-		// if we have bad input....
-		if(!worldContext || startingTime <= 0.f)
+		// create a pointer for the found world. 
+		BaseWorld FoundWorld; 
+		
+		// if we get bad data, or cant get the world from the context. 
+		if(startingTime <= 0.0 || !GetWorldChecked(worldContext, foundWorld))
 		{
 			// reutrn a null value.
 			return 0.0;
 		}
-		else // else ... 
+		else
 		{
-			// get the world from the context
-			BaseWorld world = worldContext.GetWorld();
-			
-			// make sure that world pointer is valid before accessing
-			if(!world)
-			{
-				// if not return null. 
-				return 0.0; 
-			}
-			else // else ... 
-			{
-				// return the delta time between the starting time and the current worlds time.				
-				return Math.AbsFloat(startingTime - world.GetWorldTime());
-			}			
-		}
-	
+			// return the delta time between the starting time and the current worlds time.				
+			return Math.AbsFloat(startingTime - foundWorld.GetWorldTime());
+		}	
 	}
 	
 	// returns the amount of time in seconds between the starting time and now.
@@ -241,29 +255,20 @@ class ParadoxFunctionLibrary
 	// returns the current world time in seconds. 
 	static float GetTimeInSeconds(IEntity worldContext)
 	{
-		// if we have bad input....
-		if(!worldContext)
+		// create a pointer for the found world. 
+		BaseWorld FoundWorld; 
+		
+		// if we cant get the world from the context. 
+		if(!GetWorldChecked(worldContext, foundWorld))
 		{
 			// reutrn a null value.
 			return 0.0;
 		}
-		else // else ... 
+		else
 		{
-			// get the world from the context
-			BaseWorld world = worldContext.GetWorld();
-			
-			// make sure that world pointer is valid before accessing
-			if(!world)
-			{
-				// if not return null. 
-				return 0.0; 
-			}
-			else // else ... 
-			{
-				// return the time in seconds. 
-				return ConvertTimeFromMSToSeconds(world.GetWorldTime()); 
-			}
-		}
+			// return the time in seconds. 
+			return ConvertTimeFromMSToSeconds(foundWorld.GetWorldTime()); 
+		}	
 	}
 };
 
