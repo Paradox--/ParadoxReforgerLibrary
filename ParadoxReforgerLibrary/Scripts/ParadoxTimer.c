@@ -1,4 +1,6 @@
 // This is a simple timer class that allows you to share functionality between game objects. 
+// This is meant to be used when you want to control an internal timer rather than use ScriptCallQueue. 
+// THIS IS NOT REPLICATED, so really only mean to run on the system that creates it. 
 // -- Paradox
 
 // To use this class:
