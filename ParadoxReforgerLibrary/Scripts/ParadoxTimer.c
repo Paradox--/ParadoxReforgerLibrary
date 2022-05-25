@@ -3,7 +3,11 @@
 
 // To use this class:
 // add this to the script that requires a timer: 
-// ParadoxTimer MyTimer = new ParadoxTimer(owningEntity, boolean doWeLoop, float amountOfTimeToWait); 
+// ParadoxTimer MyTimer = new ParadoxTimer(); 
+//
+// When you want to start a timer:
+// MyTimer.SetTimer(IEntity myIEntityContext, boolean doWeLoop, float amountOfTimeToWait);
+//
 // 
 // then when your script when you recieve a frame update for example the IEntity EOnFrame event:
 // MyTimer.TimerTick(owner, timeSlice); 
@@ -43,13 +47,8 @@ class ParadoxTimer
 	ref ScriptInvoker m_OnTimerFired = new ScriptInvoker();
 	
 	// -- Class Constructor -- // 
-	void ParadoxTimer(IEntity timerWorldContext, bool bDoesLoop, float amountOfTimeToWaitInSeconds)
-	{
-		// set our base properties
-		m_bIsActive = true; 
-		m_bDoesLoop = bDoesLoop; 
-		m_fStartTime = ParadoxFunctionLibrary.GetTimeInSeconds(timerWorldContext);
-		m_fTimerDelay = amountOfTimeToWait; 		
+	void ParadoxTimer()
+	{		
 	}
 	
 	void ~ParadoxTimer()
@@ -59,6 +58,12 @@ class ParadoxTimer
 	}
 	
 	// -- Timer Methods -- // 
+	// returns if the timer is valid (has valid data and is active)
+	bool IsValid()
+	{
+		return IsTimerActive() && (GetTimerStartTime() > 0.0) && (GetTimerDelay() > 0.0); 
+	}
+	
 	// returns if the timer is active or not. 
 	bool IsTimerActive()
 	{
@@ -69,6 +74,36 @@ class ParadoxTimer
 	bool DoesTimerLoop()
 	{
 		return m_bDoesLoop; 
+	}
+	
+	// Sets the timer rather than doing it from a constructor for ease of use. 
+	// returns if this timer is able to tick after this point. 
+	bool SetTimer(IEntity timerWorldContext, bool bDoesLoop, float amountOfTimeToWaitInSeconds)
+	{
+		// if we are already running...
+		if(IsTimerActive())
+		{
+			// stop our timer before we set new data. 
+			StopTimer(); 
+		}
+		
+		// if we get invalid input. 
+		if(!timerWorldContext || amountOfTimeToWaitInSeconds <= 0.0)
+		{
+			// set that we can not run
+			return false;
+		}
+		else // else ... 
+		{
+			// set our base properties
+			m_bIsActive = true; 
+			m_bDoesLoop = bDoesLoop; 
+			m_fStartTime = ParadoxFunctionLibrary.GetTimeInSeconds(timerWorldContext);
+			m_fTimerDelay = amountOfTimeToWait; 
+			
+			// return if our timer is valid based on our incoming data. 
+			return IsValid(); 
+		}		
 	}
 	
 	// returns the starting time of this timer, will be in seconds. 
@@ -87,7 +122,7 @@ class ParadoxTimer
 	ScriptInvoker GetOnTimerFired()
 	{
 		return m_OnTimerFired;
-	}
+	}	
 	
 	// ticks the timer. 
 	void TimerTick(IEntity timerWorldContext, float currentTimeInMS)
@@ -115,20 +150,30 @@ class ParadoxTimer
 				}
 				else // else ... 
 				{
-					// if it does not set we are not active any longer
-					m_bIsActive = false; 					
+					// stop the timer
+					StopTimer();					
 				}
 			}
 		}
 	}
 	
-	void ClearTimer()
+	// Stops a timer, but does NOT clear the invoke list. 
+	void StopTimer()
 	{
-		// reset all the data and the invoke list. 
+		// reset all the base properties, minus the delegate
 		m_bIsActive = false; 
 		m_bDoesLoop = false;
 		m_fStartTime = 0.0; 
 		m_fTimerDelay = 0.0; 
+	}
+	
+	// Stops then clears the invokes list 
+	void ClearTimer()
+	{
+		// stop the timer. 
+		StopTimer(); 
+		
+		// reset all the data in the invoke list. 
 		m_OnTimerFired.Clear(); 
 	}
 };
