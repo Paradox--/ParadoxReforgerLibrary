@@ -210,7 +210,7 @@ class ParadoxFunctionLibrary
 	// computes in seconds. 
 	static bool HasTimeElaspedInSeconds(IEntity worldContext, float startingTime, float timeToWaitInSeconds)
 	{
-		return GetTimeElapsedInSeconds(worldContext, startingTime) >= timeToWaitInMS; 
+		return GetTimeElapsedInSeconds(worldContext, startingTime) >= timeToWaitInSeconds; 
 	}
 	
 	// returns an inputed time that is in miliseconds to seconds.  
