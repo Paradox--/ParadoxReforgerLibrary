@@ -1,0 +1,8 @@
+GameProject {
+ ID "ParadoxReforgerLibrary"
+ GUID "5972615E5BE3A802"
+ TITLE "ParadoxReforgerLibrary"
+ Dependencies {
+  "5614BBCCBB55ED1C" "58D0FB3206B6F859"
+ }
+}
