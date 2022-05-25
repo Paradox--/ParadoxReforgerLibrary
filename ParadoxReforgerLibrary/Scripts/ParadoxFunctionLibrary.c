@@ -189,6 +189,18 @@ class ParadoxFunctionLibrary
 		return GetTimeElapsedInSeconds(worldContext, startingTime) >= timeToWaitInMS; 
 	}
 	
+	// returns an inputed time that is in miliseconds to seconds.  
+	static float ConvertTimeFromMSToSeconds(float timeInMS)
+	{
+		return timeInMS / 1000.0; 
+	}
+	
+	// returns an inputed time in seconds as time in MS
+	static float ConvertTimeFromSecondsToMS(float timeInSeconds)
+	{
+		return timeInMS * 1000.0; 
+	}
+	
 	// returns the time elapsed between now and the starting time in miliseconds. 
 	// if the world context is null or the starting time is less than or equal to zero this will fail. 
 	static float GetTimeElapsed(IEntity worldContext, float startingTime)
@@ -223,7 +235,7 @@ class ParadoxFunctionLibrary
 	static float GetTimeElapsedInSeconds(IEntity worldContext, float startingTime)
 	{
 		// return the result of the current time elapsed in MS adjusted to seconds. 
-		return GetTimeElapsed(worldContext, startingTime) / 1000.0; 
+		return ConvertTimeFromMSToSeconds(GetTimeElapsed(worldContext, startingTime)); 
 	}
 	
 	// returns the current world time in seconds. 
@@ -249,7 +261,7 @@ class ParadoxFunctionLibrary
 			else // else ... 
 			{
 				// return the time in seconds. 
-				return world.GetWorldTime() / 1000.0; 
+				return ConvertTimeFromMSToSeconds(world.GetWorldTime()); 
 			}
 		}
 	}
