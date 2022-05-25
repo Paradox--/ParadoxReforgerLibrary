@@ -20,7 +20,11 @@ class ParadoxFunctionLibrary
 	{
 	}
 	
-	// -- Rank Methods -- // 
+	//-----------------------//
+	// -- Rank Methods 	  -- // 
+	//-----------------------//
+	
+	
 	// returns if the character rank valid
 	static bool IsCharacterRankValid(IEntity characterToCheck)
 	{
@@ -57,7 +61,11 @@ class ParadoxFunctionLibrary
 		return SCR_CharacterRankComponent.GetCharacterRank(characterToCheck) > rankThreshold;
 	}	
 	
-	// -- Faction Methods -- // 
+	//-----------------------//
+	// -- Faction Methods -- //
+	//-----------------------//
+	
+	 
 	// returns if we can get the character faction off an entity. 
 	// if the result is true, then outFaction will be set. 
 	static bool IsAbleToGetCharacterFaction(IEntity characterToProcess, out Faction outFaction)
@@ -94,6 +102,7 @@ class ParadoxFunctionLibrary
 	
 	// returns if character A is friendly towards character B. 
 	// expensive due to a cast, try to use this only when needed for max performance. 
+	// think of this as asking if the characters are on the same team. 
 	static bool IsCharacterFriendly(IEntity characterA, IEntity characterB)
 	{
 		// create temp variables to be filled out by the below calls. 
@@ -113,9 +122,33 @@ class ParadoxFunctionLibrary
 		}		
 	}
 	
-	// -- Array Methods -- // 
+	// returns if character A is hostile towards character B
+	// think of this as asking if the character are on opposite teams. 
+	static bool IsCharacterHostile(IEntity characterA, IEntity characterB)
+	{
+		// create temp variables to be filled out by the below calls. 
+		Faction characterAFaction; 
+		Faction characterBFaction; 
+		
+		// if we are able to get valid character factions for character A and character B
+		if(IsAbleToGetCharacterFaction(characterA, characterAFaction) && IsAbleToGetCharacterFaction(characterB, characterBFaction))
+		{
+			// return if those characters are friendly or not. 
+			return characterAFaction.IsFactionEnemy(characterBFaction); 
+		}
+		else // else ... 
+		{
+			// if anything goes wrong, bail out. 
+			return false; 
+		}	
+	}
+	
+	//-----------------------//
+	// -- Array Methods   -- // 
+	//-----------------------//
+	
 	// returns an array that order that has been randomized. 
-	static bool RandomizeArrayOrder(ref array<T> inOutArrayToRandomize)
+	static bool RandomizeArrayOrder(inout array<T> inOutArrayToRandomize)
 	{
 		// if we have no array....
 		if(inOutArrayToRandomize.IsEmpty())
@@ -135,6 +168,90 @@ class ParadoxFunctionLibrary
 			// return we did a randomization. 
 			return true; 
 		}		
+	}
+	
+	//-----------------------//
+	// -- Time Methods 	  -- // 
+	//-----------------------//
+	
+	
+	// returns if enough time has passed between the starting time and the time to wait. 
+	// computes in miliseconds. 
+	static bool HasTimeElasped(IEntity worldContext, float startingTime, float timeToWaitInMS)
+	{
+		return GetTimeElapsed(worldContext, startingTime) >= timeToWaitInMS; 
+	}
+	
+	// returns if enough time has passed between the starting time and the time to wait. 
+	// computes in seconds. 
+	static bool HasTimeElaspedInSeconds(IEntity worldContext, float startingTime, float timeToWaitInSeconds)
+	{
+		return GetTimeElapsedInSeconds(worldContext, startingTime) >= timeToWaitInMS; 
+	}
+	
+	// returns the time elapsed between now and the starting time in miliseconds. 
+	// if the world context is null or the starting time is less than or equal to zero this will fail. 
+	static float GetTimeElapsed(IEntity worldContext, float startingTime)
+	{
+		// if we have bad input....
+		if(!worldContext || startingTime <= 0.f)
+		{
+			// reutrn a null value.
+			return 0.0;
+		}
+		else // else ... 
+		{
+			// get the world from the context
+			BaseWorld world = worldContext.GetWorld();
+			
+			// make sure that world pointer is valid before accessing
+			if(!world)
+			{
+				// if not return null. 
+				return 0.0; 
+			}
+			else // else ... 
+			{
+				// return the delta time between the starting time and the current worlds time.				
+				return Math.AbsFloat(startingTime - world.GetWorldTime());
+			}			
+		}
+	
+	}
+	
+	// returns the amount of time in seconds between the starting time and now.
+	static float GetTimeElapsedInSeconds(IEntity worldContext, float startingTime)
+	{
+		// return the result of the current time elapsed in MS adjusted to seconds. 
+		return GetTimeElapsed(worldContext, startingTime) / 1000.0; 
+	}
+	
+	// returns the current world time in seconds. 
+	static float GetTimeInSeconds(IEntity worldContext)
+	{
+		// if we have bad input....
+		if(!worldContext)
+		{
+			// reutrn a null value.
+			return 0.0;
+		}
+		else // else ... 
+		{
+			// get the world from the context
+			BaseWorld world = worldContext.GetWorld();
+			
+			// make sure that world pointer is valid before accessing
+			if(!world)
+			{
+				// if not return null. 
+				return 0.0; 
+			}
+			else // else ... 
+			{
+				// return the time in seconds. 
+				return world.GetWorldTime() / 1000.0; 
+			}
+		}
 	}
 };
 
