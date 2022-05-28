@@ -30,6 +30,19 @@ class SCR_ParadoxFactionTrigger : SCR_ParadoxTriggerBase
 	[Attribute("MyCustomFaction", UIWidgets.EditBox, desc: "The custom string representation of a custom faction", category: "Faction Trigger Settings")]
 	string m_CustomFactionIDString; 
 	
+	// -- Constructor / Destructor -- // 
+	
+	void ~SCR_ParadoxFactionTrigger()
+	{
+		// if we can auto register, and we are on the server... 
+		if(CanTriggerAutoRegister() && Replication.IsServer())
+		{
+			// remove ourselves on destruction. 
+			// this allows desginers, or other scripts to destroy these at will. 
+			ParadoxTriggerFunctionLibrary.RemoveFactionTriggerWithTag(this);
+		}
+	}
+	
 	// -- Faction Trigger Methods -- // 
 	
 	// returns if we can accept any overlaps from the US Faction characters
@@ -115,4 +128,12 @@ class SCR_ParadoxFactionTrigger : SCR_ParadoxTriggerBase
 	{
 		return m_CustomFactionIDString; 
 	}	
+	
+	// add a trigger to the manager, but we make sure we add the correct type. 
+	override void OnTriggerWaitToInit()
+	{
+		// add this element to the list. 
+		ParadoxTriggerFunctionLibrary.AddFactionTriggerWithTag(this);	
+	}
+	
 };

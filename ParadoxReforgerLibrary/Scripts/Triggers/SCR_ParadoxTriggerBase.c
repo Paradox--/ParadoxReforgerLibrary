@@ -4,6 +4,10 @@
 //
 // -> A basic overlap is one that is always going to happen if this triggered is enabled. 
 //
+// If you want to listen to the trigger going off use: 
+// GetOnActivate() for start overlap 
+// GetOnDeactivate() for End overlap events. 
+//
 // Workbench Editor Note: The entity editor props category will be created with this trigger.  So in your world you can simple drag this trigger in like any regular trigger. 
 // -- Paradox
 
@@ -20,6 +24,13 @@ class SCR_ParadoxTriggerBase : SCR_BaseTriggerEntity
 	[Attribute(defvalue: "false", uiwidget: UIWidgets.CheckBox, desc: "If true, this trigger will accept overlap events", category: "Trigger Settings")]
 	bool m_bCanBeTriggered; 
 	
+	// Can this trigger auto register to the trigger manager? 
+	[Attribute(defvalue: "false", uiwidget: UIWidgets.CheckBox, desc: "If true, this trigger will accept overlap events", category: "Trigger Settings")]
+	bool m_bCanTriggerAutoRegister; 
+	
+	[Attribute("NULL", UIWidgets.EditBox, desc: "A string tag for this trigger, useful for get trigger of tag functions.", category: "Trigger Settings")]
+	string m_TriggerTag; 
+	
 	// the amount of objects overlapping us. 
 	protected int m_OverlappedCount = 0; 	
 	
@@ -27,11 +38,31 @@ class SCR_ParadoxTriggerBase : SCR_BaseTriggerEntity
 	// returns the state and pointer to the trigger that fired it. Example Catch of this void MyMethod(bool bNewState, SCR_ParadoxTriggerBase triggerThatUpdatedState)
 	ref ScriptInvoker m_OnTriggerCanBeTriggerStateChanged = new ScriptInvoker();
 	
+	// -- Constructor / Destructor -- // 
+	
+	void ~SCR_ParadoxTriggerBase()
+	{
+		// if we can auto register, and we are on the server... 
+		if(CanTriggerAutoRegister() && Replication.IsServer())
+		{
+			// remove ourselves on destruction. 
+			// this allows desginers, or other scripts to destroy these at will. 
+			ParadoxTriggerFunctionLibrary.RemoveBasicTriggerWithTag(this);
+		}		
+	}	
+	
 	// -- Trigger Methods -- // 
+	
 	// returns if we can be triggered or not. 
 	bool CanBeTriggered() 
 	{
 		return m_bCanBeTriggered; 
+	}
+	
+	// returns if we can auto register. 
+	bool CanTriggerAutoRegister()
+	{
+		return m_bCanTriggerAutoRegister; 
 	}
 	
 	// returns if we can add this character to the trigger. 
@@ -69,6 +100,17 @@ class SCR_ParadoxTriggerBase : SCR_BaseTriggerEntity
 		}
     }
 	
+	// checks if a trigger has a null tag, i.e. an empty tag. 
+	bool DoesTriggerHaveNullTag() 
+	{
+		return GetTriggerTag().IsEmpty() || (GetTriggerTag() == "NULL"); 
+	}
+	
+	// checks if the this trigger has a specific tag. 
+	bool DoesTriggerHaveTag(string otherTag)
+	{
+		return GetTriggerTag() == otherTag; 
+	}
 	
 	// returns the overlapping object count. 
 	int GetOverlappingObjectCount() 
@@ -76,11 +118,38 @@ class SCR_ParadoxTriggerBase : SCR_BaseTriggerEntity
 		return m_OverlappedCount; 
 	}
 	
+	string GetTriggerTag()
+	{
+		return m_TriggerTag;
+	}
+	
 	// returns the state update delegate
 	ScriptInvoker GetOnTriggerCanUpdateStateChange()
 	{
 		return m_OnTriggerCanBeTriggerStateChanged;
-	}		
+	}	
+	
+	// engine event for init. 
+	override void EOnInit(IEntity owner)
+	{
+		// call the super. 
+		super.EOnInit(owner);
+		
+		
+		// if we can auto register, and we are on the server... 
+		if(CanTriggerAutoRegister() && Replication.IsServer())
+		{
+			// get the game and tell it to wait. 
+			GetGame().GetCallqueue().CallLater(OnTriggerWaitToInit, 2000, false);
+		}	
+	}	
+	
+	// event for when we should trigger. 
+	void OnTriggerWaitToInit()
+	{
+		// add this element to the list. 
+		ParadoxTriggerFunctionLibrary.AddBasicTriggerWithTag(this);	
+	}
 	 
 	// overridden on valid overlap start event. 
     override void OnActivate(IEntity ent)
