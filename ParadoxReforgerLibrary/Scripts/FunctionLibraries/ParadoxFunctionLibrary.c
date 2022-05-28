@@ -115,7 +115,56 @@ class ParadoxFunctionLibrary
 				return outFaction != null; 				
 			}
 		}
-	}	
+	}
+	
+	// Tests a characters faction for a specific faction. 
+	static bool IsCharacterOfSpecificFaction(SCR_ChimeraCharacter characterToTest, string factionID)
+	{
+		// if we get bad input. 
+		if(!characterToTest)
+		{
+			// fail out. 
+			return false; 
+		}
+		else // else ... 
+		{
+			// return if the characters faction is the same as the requested string ID
+			return IsFactionTheSame(characterToTest.GetFaction(), factionID); 
+		}	
+	}
+	
+	// returns if this faction is of the same faction id. 
+	static bool IsFactionTheSame(Faction factionToTest, string factionID)
+	{
+		// if we get bad input
+		if(!factionToTest || factionID.Length() <= 0)
+		{
+			// bail out. 
+			return false; 
+		}
+		else // else ... 
+		{
+			return factionToTest.GetFactionKey() == factionID;			
+		}
+	}
+	
+	// generic helper method to tell if a faction is a US faction
+	static bool IsUSFaction(Faction factionToTest)
+	{
+		return IsFactionTheSame(factionToTest, "US"); 
+	}
+	
+	// generic helper method to tell if a faction is a USSR Faction. 
+	static bool IsUSSRFaction(Faction factionToTest)
+	{
+		return IsFactionTheSame(factionToTest, "USSR"); 
+	}
+	
+	// generic helper method to tell if a faction is a FIA faction
+	static bool IsFIAFaction(Faction factionToTest)
+	{
+		return IsFactionTheSame(factionToTest, "FIA"); 
+	}
 	
 	// returns if character A is friendly towards character B. 
 	// expensive due to a cast, try to use this only when needed for max performance. 

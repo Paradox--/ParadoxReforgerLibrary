@@ -1,6 +1,16 @@
 // Template Array function library class to allow for arrays of all types to use this in a templated manner. 
 // This function library holds common array methods that might be useful for your project. 
-// -- Paradox
+// -- Paradox 
+//
+// Example:
+// array<IEntity> MyArray = array<IEntity>(); // array declared at some point 
+//
+// when we need to use it:
+// if(ParadoxArrayFunctionLibrary<IEntity>.IsValidIndexForArray(MyArray, SomeIndex))
+// {
+// 		// some code that runs.... 
+// }
+
 
 class ParadoxArrayFunctionLibrary<Class T>
 {
