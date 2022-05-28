@@ -77,7 +77,7 @@ class ParadoxTriggerFunctionLibrary
 	}
 	
 	// returns if we could get a copy list from the master list. 
-	bool FindFactionTriggerListWithTag(string tagToFind, out array<SCR_ParadoxFactionTrigger> foundTriggers)
+	static bool FindFactionTriggerListWithTag(string tagToFind, out array<SCR_ParadoxFactionTrigger> foundTriggers)
 	{
 		// if the trigger manager is null. 
 		if(!HasTriggerManager())
@@ -133,7 +133,7 @@ class ParadoxTriggerFunctionLibrary
 		}	
 	}
 	
-	bool RemoveFactionTriggerWithTag(SCR_ParadoxFactionTrigger triggerToRemove)
+	static bool RemoveFactionTriggerWithTag(SCR_ParadoxFactionTrigger triggerToRemove)
 	{
 		// if the trigger manager is null. 
 		if(!HasTriggerManager())

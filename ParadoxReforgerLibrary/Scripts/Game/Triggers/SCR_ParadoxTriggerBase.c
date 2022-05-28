@@ -24,6 +24,10 @@ class SCR_ParadoxTriggerBase : SCR_BaseTriggerEntity
 	[Attribute(defvalue: "false", uiwidget: UIWidgets.CheckBox, desc: "If true, this trigger will accept overlap events", category: "Trigger Settings")]
 	bool m_bCanBeTriggered; 
 	
+	// Can this trigger auto register to the trigger manager? 
+	[Attribute(defvalue: "false", uiwidget: UIWidgets.CheckBox, desc: "If true, this trigger will accept overlap events", category: "Trigger Settings")]
+	bool m_bCanTriggerAutoRegister; 
+	
 	[Attribute("NULL", UIWidgets.EditBox, desc: "A string tag for this trigger, useful for get trigger of tag functions.", category: "Trigger Settings")]
 	string m_TriggerTag; 
 	
@@ -34,11 +38,31 @@ class SCR_ParadoxTriggerBase : SCR_BaseTriggerEntity
 	// returns the state and pointer to the trigger that fired it. Example Catch of this void MyMethod(bool bNewState, SCR_ParadoxTriggerBase triggerThatUpdatedState)
 	ref ScriptInvoker m_OnTriggerCanBeTriggerStateChanged = new ScriptInvoker();
 	
+	// -- Constructor / Destructor -- // 
+	
+	void ~SCR_ParadoxTriggerBase()
+	{
+		// if we can auto register, and we are on the server... 
+		if(CanTriggerAutoRegister() && Replication.IsServer())
+		{
+			// remove ourselves on destruction. 
+			// this allows desginers, or other scripts to destroy these at will. 
+			ParadoxTriggerFunctionLibrary.RemoveBasicTriggerWithTag(this);
+		}		
+	}	
+	
 	// -- Trigger Methods -- // 
+	
 	// returns if we can be triggered or not. 
 	bool CanBeTriggered() 
 	{
 		return m_bCanBeTriggered; 
+	}
+	
+	// returns if we can auto register. 
+	bool CanTriggerAutoRegister()
+	{
+		return m_bCanTriggerAutoRegister; 
 	}
 	
 	// returns if we can add this character to the trigger. 
@@ -103,7 +127,29 @@ class SCR_ParadoxTriggerBase : SCR_BaseTriggerEntity
 	ScriptInvoker GetOnTriggerCanUpdateStateChange()
 	{
 		return m_OnTriggerCanBeTriggerStateChanged;
-	}		
+	}	
+	
+	// engine event for init. 
+	override void EOnInit(IEntity owner)
+	{
+		// call the super. 
+		super.EOnInit(owner);
+		
+		
+		// if we can auto register, and we are on the server... 
+		if(CanTriggerAutoRegister() && Replication.IsServer())
+		{
+			// get the game and tell it to wait. 
+			GetGame().GetCallqueue().CallLater(OnTriggerWaitToInit, 2000, false);
+		}	
+	}	
+	
+	// event for when we should trigger. 
+	void OnTriggerWaitToInit()
+	{
+		// add this element to the list. 
+		ParadoxTriggerFunctionLibrary.AddBasicTriggerWithTag(this);	
+	}
 	 
 	// overridden on valid overlap start event. 
     override void OnActivate(IEntity ent)
