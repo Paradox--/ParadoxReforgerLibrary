@@ -11,7 +11,11 @@
 // 		// some code that runs.... 
 // }
 
-
+//------------------------------------------------------------------
+// Array Helper Library 											-
+// Generic methods for arrays, goal to reduce copy paste code 		-
+// operations that are done commonly.								-
+//------------------------------------------------------------------
 class ParadoxArrayFunctionLibrary<Class T>
 {
 	//-----------------------//

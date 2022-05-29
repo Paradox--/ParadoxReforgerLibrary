@@ -172,11 +172,10 @@ class ParadoxTriggerFunctionLibrary
 			// bail out... 
 			return; 
 		}
-		else // else ... 
+		else // else .. 
 		{
 			// remove that pointer. 
 			runtimeManagerPtr = null;
 		}
 	}
-	
 };

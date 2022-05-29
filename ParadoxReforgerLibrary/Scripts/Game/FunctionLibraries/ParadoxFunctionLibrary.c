@@ -37,6 +37,31 @@ class ParadoxFunctionLibrary
 		}
 	}*/
 	
+	// Returns a created entity spawn params from the params. 
+	// reduces the copy paste around the API.  
+	static EntitySpawnParams CreateSpawnParams(ETransformMode TMode, vector Location, float OptionalScale = 1.0, IEntity OptionalOwner = null)
+	{
+		EntitySpawnParams OutParams = new EntitySpawnParams(); 
+		OutParams.TransformMode = TMode; 
+		OutParams.Transform[3] = Location;
+		OutParams.Parent = OptionalOwner;
+		OutParams.Scale = OptionalScale; 
+		
+		return OutParams; 
+	}
+	
+	// creates a spawn param set to spawn at a specific entity. 
+	static EntitySpawnParams CreateSpawnParamsAtEntity(IEntity EntityToSpawnAt, ETransformMode TMode, float OptionalScale = 1.0, IEntity OptionalOwner = null)
+	{
+		EntitySpawnParams OutParams = new EntitySpawnParams(); 
+		OutParams.TransformMode = TMode; 
+		EntityToSpawnAt.GetWorldTransform(OutParams.Transform);
+		OutParams.Parent = OptionalOwner;
+		OutParams.Scale = OptionalScale; 
+		
+		return OutParams; 
+	}
+	
 	//-----------------------//
 	// -- Rank Methods 	  -- // 
 	//-----------------------//

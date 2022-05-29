@@ -1,7 +1,11 @@
 // A basic function library for common Map container methods. Cut down on copy paste code. 
 // -- Paradox 
 
-
+//------------------------------------------------------------------
+// Map Helper Library 												-
+// Generic methods for Maps, goal to reduce copy paste code 		-
+// operations that are done commonly.								-
+//------------------------------------------------------------------
 class ParadoxMapFunctionLibrary<Class TKey, Class TValue>
 {
 	//------------------------//

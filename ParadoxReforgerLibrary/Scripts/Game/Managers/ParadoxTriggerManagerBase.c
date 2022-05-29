@@ -7,6 +7,11 @@ class ParadoxTriggerManagerBaseClass: GenericEntityClass
 {
 };
 
+//------------------------------------------------------------------
+// Trigger Manager		 											-
+// A basic trigger manager that contains triggers that be  		-
+// accessed and queried by other outside objects. 					-
+//------------------------------------------------------------------
 class ParadoxTriggerManagerBase: GenericEntity
 {
 	// -- Class Properties -- // 
